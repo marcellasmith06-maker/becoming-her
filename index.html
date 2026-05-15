@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Becoming Her" />
+  <meta name="theme-color" content="#0e0a0f" />
+  <title>Becoming Her — Your Healing Coach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: #0e0a0f; font-family: 'DM Sans', sans-serif; color: rgba(232,196,240,0.92); overflow: hidden; }
+    .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: #0e0a0f; }
+    .header { background: #12080f; padding: 52px 20px 16px; border-bottom: 0.5px solid rgba(200,160,210,0.12); text-align: center; flex-shrink: 0; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #e8c4f0; }
+    .tagline { font-size: 10px; color: rgba(200,160,210,0.4); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+    .stages { display: flex; gap: 8px; padding: 12px 16px; background: #0e0a0f; border-bottom: 0.5px solid rgba(200,160,210,0.08); flex-shrink: 0; }
+    .stage-btn { flex: 1; padding: 8px 6px; border-radius: 24px; border: 0.5px solid rgba(200,160,210,0.2); background: transparent; color: rgba(200,160,210,0.5); font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.25s; }
+    .stage-btn.active { background: rgba(180,100,200,0.25); border-color: rgba(200,160,210,0.4); color: #e8c4f0; }
+    .chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+    .msg { display: flex; gap: 8px; align-items: flex-end; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .msg.user { flex-direction: row-reverse; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6b2f7e,#3d1a4a); border: 0.5px solid rgba(200,160,210,0.3); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond',serif; font-size: 12px; color: #e8c4f0; margin-bottom: 2px; }
+    .bubble { max-width: 78%; padding: 10px 14px; font-size: 14px; line-height: 1.6; }
+    .msg.coach .bubble { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(200,160,210,0.13); color: rgba(232,196,240,0.92); border-radius: 4px 16px 16px 16px; }
+    .msg.user .bubble { background: rgba(180,100,200,0.22); border: 0.5px solid rgba(200,160,210,0.28); color: #e8c4f0; border-radius: 16px 4px 16px 16px; }
+    .typing { display:flex; gap:5px; padding:14px; align-items:center; }
+    .typing span { width:6px; height:6px; border-radius:50%; background:rgba(200,160,210,0.4); animation:pulse 1.3s infinite; }
+    .typing span:nth-child(2){animation-delay:0.18s;} .typing span:nth-child(3){animation-delay:0.36s;}
+    @keyframes pulse{0%,60%,100%{opacity:0.25;transform:scale(0.9);}30%{opacity:1;transform:scale(1.15);}}
+    .quick-wrap { padding: 0 16px 10px; flex-shrink: 0; }
+    .quick-label { text-align:center; font-size:10px; letter-spacing:1.5px; color:rgba(200,160,210,0.25); text-transform:uppercase; margin-bottom:8px; }
+    .quick-btn { display:block; width:100%; margin-bottom:6px; padding:10px 14px; border-radius:24px; border:0.5px solid rgba(200,160,210,0.18); background:transparent; color:rgba(200,160,210,0.65); font-size:13px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:left; transition:all 0.2s; }
+    .quick-btn:active { background:rgba(180,100,200,0.12); color:#e8c4f0; }
+    .input-wrap { padding:10px 14px 24px; border-top:0.5px solid rgba(200,160,210,0.08); display:flex; gap:10px; align-items:flex-end; background:#0e0a0f; flex-shrink:0; }
+    textarea { flex:1; background:rgba(255,255,255,0.04); border:0.5px solid rgba(200,160,210,0.2); border-radius:22px; padding:11px 16px; color:#e8c4f0; font-size:14px; font-family:'DM Sans',sans-serif; outline:none; resize:none; min-height:44px; max-height:110px; line-height:1.5; -webkit-appearance:none; }
+    textarea::placeholder { color:rgba(200,160,210,0.28); }
+    textarea:focus { border-color:rgba(200,160,210,0.38); }
+    .send { width:44px; height:44px; border-radius:50%; background:rgba(180,100,200,0.28); border:0.5px solid rgba(200,160,210,0.38); color:#e8c4f0; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px; transition:all 0.2s; }
+    .send:active { background:rgba(180,100,200,0.5); transform:scale(0.96); }
+    .send:disabled { opacity:0.35; cursor:not-allowed; }
+    .error { text-align:center; font-size:11px; color:rgba(220,100,100,0.75); padding:4px 16px; flex-shrink:0; min-height:18px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo">Becoming Her</div>
+      <div class="tagline">Your healing coach · Available 24/7</div>
+    </div>
+    <div class="stages">
+      <button class="stage-btn active" onclick="setStage('wounded',this)">Wounded</button>
+      <button class="stage-btn" onclick="setStage('healing',this)">Healing</button>
+      <button class="stage-btn" onclick="setStage('her',this)">Her</button>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="error" id="error"></div>
+    <div class="quick-wrap" id="quickWrap">
+      <div class="quick-label">Start here</div>
+      <button class="quick-btn" id="q1" onclick="sendQuick(this.innerText)">I keep making excuses for his behavior</button>
+      <button class="quick-btn" id="q2" onclick="sendQuick(this.innerText)">Am I overreacting or is this actually toxic?</button>
+      <button class="quick-btn" id="q3" onclick="sendQuick(this.innerText)">I want to text him back so badly right now</button>
+    </div>
+    <div class="input-wrap">
+      <textarea id="input" placeholder="Talk to me..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send" id="sendBtn" onclick="send()">↑</button>
+    </div>
+  </div>
+  <script>
+    const SYSTEM = {
+      wounded: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: calm, direct, real. Like a woman who has been through it herself. Never say "hey love" or use filler. Respond directly to exactly what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. WOUNDED stage: She may still be in it or just left. Validate first, help her see the pattern gently. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
+      healing: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: grounded, empowering, honest. Never use filler. Respond directly to what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. HEALING stage: She's out or getting out. Help her understand her patterns and rebuild herself. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
+      her: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: confident, warm, direct. Never use filler. Respond directly to what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. HER stage: She's healed. Help her hold standards and trust herself. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`
+    };
+    const GREETINGS = {
+      wounded: "I'm glad you're here. This is a safe space — nothing you say will be judged. What's been weighing on you?",
+      healing: "Getting out takes everything. And yet here you are. What part of the healing feels hardest right now?",
+      her: "You did the work. Now it's about protecting what you've built. What's coming up for you as you step back into dating?"
+    };
+    const PROMPTS = {
+      wounded: ["I keep making excuses for his behavior","Am I overreacting or is this actually toxic?","I want to text him back so badly right now"],
+      healing: ["Why do I keep attracting the same type of man?","How do I stop trauma bonding?","I feel guilty for leaving even though he hurt me"],
+      her: ["How do I know if someone is genuinely safe?","I'm scared to open up again after being hurt","What are my non-negotiables and how do I hold them?"]
+    };
+    let stage = 'wounded', history = [], busy = false;
+    function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+    function scrollBottom() { const c=document.getElementById('chat'); c.scrollTop=c.scrollHeight; }
+    function setError(msg) { document.getElementById('error').textContent=msg; setTimeout(()=>document.getElementById('error').textContent='',5000); }
+    function addBubble(role,text) {
+      const chat=document.getElementById('chat');
+      const d=document.createElement('div'); d.className='msg '+role;
+      d.innerHTML=role==='coach'?`<div class="avatar">H</div><div class="bubble">${text}</div>`:`<div class="bubble">${text}</div>`;
+      chat.appendChild(d); scrollBottom(); return d;
+    }
+    function showTyping() {
+      const chat=document.getElementById('chat');
+      const d=document.createElement('div'); d.className='msg coach'; d.id='typing';
+      d.innerHTML=`<div class="avatar">H</div><div class="bubble typing"><span></span><span></span><span></span></div>`;
+      chat.appendChild(d); scrollBottom();
+    }
+    function hideTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
+    function init() {
+      history=[]; document.getElementById('chat').innerHTML='';
+      const g=GREETINGS[stage]; addBubble('coach',g); history.push({role:'assistant',content:g});
+    }
+    function setStage(s,btn) {
+      stage=s;
+      document.querySelectorAll('.stage-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      document.getElementById('quickWrap').style.display='block';
+      ['q1','q2','q3'].forEach((id,i)=>document.getElementById(id).innerText=PROMPTS[s][i]);
+      init();
+    }
+    async function callAPI(userMsg) {
+      history.push({role:'user',content:userMsg});
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM[stage],messages:history})});
+      if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Error '+res.status);}
+      const data=await res.json();
+      if(!data.reply) throw new Error('Empty response');
+      history.push({role:'assistant',content:data.reply});
+      return data.reply;
+    }
+    async function send() {
+      if(busy) return;
+      const input=document.getElementById('input');
+      const text=input.value.trim(); if(!text) return;
+      input.value=''; input.style.height='auto';
+      document.getElementById('quickWrap').style.display='none';
+      document.getElementById('sendBtn').disabled=true;
+      busy=true; addBubble('user',text); showTyping();
+      try { const reply=await callAPI(text); hideTyping(); addBubble('coach',reply); }
+      catch(e) { hideTyping(); history.pop(); setError('Connection issue — please try again.'); }
+      busy=false; document.getElementById('sendBtn').disabled=false;
+    }
+    function sendQuick(text) { document.getElementById('quickWrap').style.display='none'; document.getElementById('input').value=text; send(); }
+    function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+    init();
+  </script>
+</body>
+</html>
