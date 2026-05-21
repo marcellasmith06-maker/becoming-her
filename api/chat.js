@@ -1,29 +1,149 @@
-export const config = { runtime: 'nodejs' };
-
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const { system, messages } = req.body;
-  if (!system || !messages) return res.status(400).json({ error: 'Missing fields' });
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500, system, messages })
-    });
-    if (!response.ok) { const e=await response.json(); return res.status(response.status).json({ error: e.error?.message||'API error' }); }
-    const data = await response.json();
-    const reply = data.content?.[0]?.text;
-    if (!reply) return res.status(500).json({ error: 'Empty response' });
-    return res.status(200).json({ reply });
-  } catch(err) {
-    return res.status(500).json({ error: err.message });
-  }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Becoming Her" />
+  <meta name="theme-color" content="#1a0d2e" />
+  <title>Becoming Her — Your Healing Coach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg: #1c0f2e; --border: rgba(210,170,230,0.18); --border-soft: rgba(210,170,230,0.10); --accent: #c084e8; --text: rgba(238,210,248,0.95); --text-dim: rgba(200,165,220,0.60); --text-faint: rgba(200,165,220,0.35); }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; color: var(--text); overflow: hidden; }
+    body { background: var(--bg); background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(160,80,220,0.18) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 80%, rgba(100,50,180,0.12) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 10% 60%, rgba(180,80,200,0.08) 0%, transparent 60%); }
+    .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; }
+    .header { padding: 52px 20px 18px; border-bottom: 0.5px solid var(--border-soft); text-align: center; flex-shrink: 0; background: linear-gradient(180deg, rgba(30,12,50,0.95) 0%, rgba(28,15,46,0.85) 100%); backdrop-filter: blur(12px); position: relative; }
+    .header::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(192,132,232,0.4), transparent); }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; color: var(--text); animation: headerGlow 4s ease-in-out infinite; }
+    @keyframes headerGlow { 0%, 100% { text-shadow: 0 0 20px rgba(192,132,232,0.3); } 50% { text-shadow: 0 0 40px rgba(192,132,232,0.6); } }
+    .tagline { font-size: 9px; color: var(--text-faint); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 5px; }
+    .stages { display: flex; gap: 8px; padding: 14px 16px; background: rgba(20,10,36,0.7); border-bottom: 0.5px solid var(--border-soft); flex-shrink: 0; backdrop-filter: blur(8px); }
+    .stage-btn { flex: 1; padding: 9px 6px; border-radius: 28px; border: 0.5px solid var(--border); background: transparent; color: var(--text-dim); font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px; }
+    .stage-btn:hover { color: var(--text); border-color: var(--accent); }
+    .stage-btn.active { background: linear-gradient(135deg, rgba(180,100,220,0.35), rgba(140,70,200,0.20)); border-color: rgba(192,132,232,0.55); color: var(--text); box-shadow: 0 0 12px rgba(192,132,232,0.15); }
+    .chat { flex: 1; overflow-y: auto; padding: 20px 16px 8px; display: flex; flex-direction: column; gap: 14px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .chat::-webkit-scrollbar { display: none; }
+    .msg { display: flex; gap: 10px; align-items: flex-end; animation: fadeUp 0.35s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .msg.user { flex-direction: row-reverse; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7b35a0, #4a1f6a); border: 0.5px solid rgba(192,132,232,0.35); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--text); margin-bottom: 2px; box-shadow: 0 0 10px rgba(150,80,200,0.25); }
+    .bubble { max-width: 78%; padding: 11px 15px; font-size: 14px; line-height: 1.65; }
+    .msg.coach .bubble { background: rgba(255,255,255,0.07); border: 0.5px solid rgba(210,170,230,0.18); color: var(--text); border-radius: 4px 18px 18px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
+    .msg.user .bubble { background: linear-gradient(135deg, rgba(180,100,220,0.28), rgba(140,70,200,0.18)); border: 0.5px solid rgba(192,132,232,0.32); color: var(--text); border-radius: 18px 4px 18px 18px; }
+    .typing { display:flex; gap:5px; padding:14px; align-items:center; }
+    .typing span { width:6px; height:6px; border-radius:50%; background:rgba(192,132,232,0.5); animation:pulse 1.3s infinite; }
+    .typing span:nth-child(2){animation-delay:0.18s;} .typing span:nth-child(3){animation-delay:0.36s;}
+    @keyframes pulse{0%,60%,100%{opacity:0.25;transform:scale(0.9);}30%{opacity:1;transform:scale(1.2);}}
+    .quick-wrap { padding: 4px 16px 12px; flex-shrink: 0; }
+    .quick-label { text-align:center; font-size:9px; letter-spacing:2px; color:var(--text-faint); text-transform:uppercase; margin-bottom:10px; }
+    .quick-btn { display:block; width:100%; margin-bottom:7px; padding:11px 16px; border-radius:28px; border:0.5px solid var(--border); background: rgba(255,255,255,0.04); color:var(--text-dim); font-size:13px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:left; transition: all 0.2s ease; }
+    .quick-btn:hover { background: rgba(180,100,220,0.12); color:var(--text); border-color:rgba(192,132,232,0.35); }
+    .quick-btn:active { background:rgba(180,100,220,0.18); transform: scale(0.99); }
+    .input-wrap { padding:10px 14px 28px; border-top:0.5px solid var(--border-soft); display:flex; gap:10px; align-items:flex-end; background: rgba(20,10,36,0.85); backdrop-filter: blur(12px); flex-shrink:0; }
+    textarea { flex:1; background:rgba(255,255,255,0.06); border:0.5px solid var(--border); border-radius:24px; padding:11px 18px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; resize:none; min-height:44px; max-height:110px; line-height:1.5; -webkit-appearance:none; transition: border-color 0.2s; }
+    textarea::placeholder { color:var(--text-faint); }
+    textarea:focus { border-color:rgba(192,132,232,0.45); background:rgba(255,255,255,0.08); }
+    .send { width:44px; height:44px; border-radius:50%; background: linear-gradient(135deg, rgba(180,100,220,0.45), rgba(140,70,200,0.30)); border:0.5px solid rgba(192,132,232,0.45); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; transition:all 0.2s; box-shadow: 0 0 12px rgba(150,80,200,0.2); }
+    .send:active { background:rgba(180,100,220,0.6); transform:scale(0.95); }
+    .send:disabled { opacity:0.3; cursor:not-allowed; }
+    .error { text-align:center; font-size:11px; color:rgba(220,100,100,0.8); padding:4px 16px; flex-shrink:0; min-height:18px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo">Becoming Her</div>
+      <div class="tagline">Your healing coach · Available 24/7</div>
+    </div>
+    <div class="stages">
+      <button class="stage-btn active" onclick="setStage('wounded',this)">Wounded</button>
+      <button class="stage-btn" onclick="setStage('healing',this)">Healing</button>
+      <button class="stage-btn" onclick="setStage('her',this)">Her</button>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="error" id="error"></div>
+    <div class="quick-wrap" id="quickWrap">
+      <div class="quick-label">Start here</div>
+      <button class="quick-btn" id="q1" onclick="sendQuick(this.innerText)">I keep making excuses for his behavior</button>
+      <button class="quick-btn" id="q2" onclick="sendQuick(this.innerText)">Am I overreacting or is this actually toxic?</button>
+      <button class="quick-btn" id="q3" onclick="sendQuick(this.innerText)">I want to text him back so badly right now</button>
+    </div>
+    <div class="input-wrap">
+      <textarea id="input" placeholder="Talk to me..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send" id="sendBtn" onclick="send()">↑</button>
+    </div>
+  </div>
+  <script>
+    const SYSTEM = {
+      wounded: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: calm, direct, real. Like a woman who has been through it herself. Never say "hey love" or use filler. Respond directly to exactly what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. WOUNDED stage: She may still be in it or just left. Validate first, help her see the pattern gently. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
+      healing: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: grounded, empowering, honest. Never use filler. Respond directly to what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. HEALING stage: She's out or getting out. Help her understand her patterns and rebuild herself. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
+      her: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: confident, warm, direct. Never use filler. Respond directly to what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. HER stage: She's healed. Help her hold standards and trust herself. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`
+    };
+    const GREETINGS = {
+      wounded: "I'm glad you're here. This is a safe space — nothing you say will be judged. What's been weighing on you?",
+      healing: "Getting out takes everything. And yet here you are. What part of the healing feels hardest right now?",
+      her: "You did the work. Now it's about protecting what you've built. What's coming up for you as you step back into dating?"
+    };
+    const PROMPTS = {
+      wounded: ["I keep making excuses for his behavior","Am I overreacting or is this actually toxic?","I want to text him back so badly right now"],
+      healing: ["Why do I keep attracting the same type of man?","How do I stop trauma bonding?","I feel guilty for leaving even though he hurt me"],
+      her: ["How do I know if someone is genuinely safe?","I'm scared to open up again after being hurt","What are my non-negotiables and how do I hold them?"]
+    };
+    let stage = 'wounded', history = [], busy = false;
+    function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+    function scrollBottom() { const c=document.getElementById('chat'); c.scrollTop=c.scrollHeight; }
+    function setError(msg) { document.getElementById('error').textContent=msg; setTimeout(()=>document.getElementById('error').textContent='',5000); }
+    function addBubble(role,text) {
+      const chat=document.getElementById('chat');
+      const d=document.createElement('div'); d.className='msg '+role;
+      d.innerHTML=role==='coach'?`<div class="avatar">H</div><div class="bubble">${text}</div>`:`<div class="bubble">${text}</div>`;
+      chat.appendChild(d); scrollBottom(); return d;
+    }
+    function showTyping() {
+      const chat=document.getElementById('chat');
+      const d=document.createElement('div'); d.className='msg coach'; d.id='typing';
+      d.innerHTML=`<div class="avatar">H</div><div class="bubble typing"><span></span><span></span><span></span></div>`;
+      chat.appendChild(d); scrollBottom();
+    }
+    function hideTyping() { const t=document.getElementById('typing'); if(t) t.remove(); }
+    function init() {
+      history=[]; document.getElementById('chat').innerHTML='';
+      const g=GREETINGS[stage]; addBubble('coach',g); history.push({role:'assistant',content:g});
+    }
+    function setStage(s,btn) {
+      stage=s;
+      document.querySelectorAll('.stage-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      document.getElementById('quickWrap').style.display='block';
+      ['q1','q2','q3'].forEach((id,i)=>document.getElementById(id).innerText=PROMPTS[s][i]);
+      init();
+    }
+    async function callAPI(userMsg) {
+      history.push({role:'user',content:userMsg});
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM[stage],messages:history})});
+      if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Error '+res.status);}
+      const data=await res.json();
+      if(!data.reply) throw new Error('Empty response');
+      history.push({role:'assistant',content:data.reply});
+      return data.reply;
+    }
+    async function send() {
+      if(busy) return;
+      const input=document.getElementById('input');
+      const text=input.value.trim(); if(!text) return;
+      input.value=''; input.style.height='auto';
+      document.getElementById('quickWrap').style.display='none';
+      document.getElementById('sendBtn').disabled=true;
+      busy=true; addBubble('user',text); showTyping();
+      try { const reply=await callAPI(text); hideTyping(); addBubble('coach',reply); }
+      catch(e) { hideTyping(); history.pop(); setError('Connection issue — please try again.'); }
+      busy=false; document.getElementById('sendBtn').disabled=false;
+    }
+    function sendQuick(text) { document.getElementById('quickWrap').style.display='none'; document.getElementById('input').value=text; send(); }
+    function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+    init();
+  </script>
+</body>
+</html>
