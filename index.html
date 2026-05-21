@@ -10,36 +10,19 @@
   <title>Becoming Her — Your Healing Coach</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #1c0f2e;
-      --bg2: #231540;
-      --surface: rgba(255,255,255,0.06);
-      --border: rgba(210,170,230,0.18);
-      --border-soft: rgba(210,170,230,0.10);
-      --accent: #c084e8;
-      --accent-dim: rgba(180,100,220,0.30);
-      --text: rgba(238,210,248,0.95);
-      --text-dim: rgba(200,165,220,0.60);
-      --text-faint: rgba(200,165,220,0.35);
-    }
+    :root { --bg: #1c0f2e; --border: rgba(210,170,230,0.18); --border-soft: rgba(210,170,230,0.10); --accent: #c084e8; --text: rgba(238,210,248,0.95); --text-dim: rgba(200,165,220,0.60); --text-faint: rgba(200,165,220,0.35); }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; font-family: 'DM Sans', sans-serif; color: var(--text); overflow: hidden; }
-    body {
-      background: var(--bg);
-      background-image:
-        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(160,80,220,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(100,50,180,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 30% at 10% 60%, rgba(180,80,200,0.08) 0%, transparent 60%);
-    }
+    body { background: var(--bg); background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(160,80,220,0.18) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 80%, rgba(100,50,180,0.12) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 10% 60%, rgba(180,80,200,0.08) 0%, transparent 60%); }
     .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; }
-    .header { padding: 52px 20px 18px; border-bottom: 0.5px solid rgba(210,170,230,0.10); text-align: center; flex-shrink: 0; background: linear-gradient(180deg, rgba(30,12,50,0.95) 0%, rgba(28,15,46,0.85) 100%); backdrop-filter: blur(12px); position: relative; }
+    .header { padding: 52px 20px 18px; border-bottom: 0.5px solid var(--border-soft); text-align: center; flex-shrink: 0; background: linear-gradient(180deg, rgba(30,12,50,0.95) 0%, rgba(28,15,46,0.85) 100%); backdrop-filter: blur(12px); position: relative; }
     .header::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(192,132,232,0.4), transparent); }
     .logo { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; color: var(--text); animation: headerGlow 4s ease-in-out infinite; }
     @keyframes headerGlow { 0%, 100% { text-shadow: 0 0 20px rgba(192,132,232,0.3); } 50% { text-shadow: 0 0 40px rgba(192,132,232,0.6); } }
-    .tagline { font-size: 9px; color: rgba(200,165,220,0.35); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 5px; }
-    .stages { display: flex; gap: 8px; padding: 14px 16px; background: rgba(20,10,36,0.7); border-bottom: 0.5px solid rgba(210,170,230,0.10); flex-shrink: 0; backdrop-filter: blur(8px); }
-    .stage-btn { flex: 1; padding: 9px 6px; border-radius: 28px; border: 0.5px solid rgba(210,170,230,0.18); background: transparent; color: rgba(200,165,220,0.60); font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px; }
-    .stage-btn:hover { color: var(--text); border-color: #c084e8; }
+    .tagline { font-size: 9px; color: var(--text-faint); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 5px; }
+    .stages { display: flex; gap: 8px; padding: 14px 16px; background: rgba(20,10,36,0.7); border-bottom: 0.5px solid var(--border-soft); flex-shrink: 0; backdrop-filter: blur(8px); }
+    .stage-btn { flex: 1; padding: 9px 6px; border-radius: 28px; border: 0.5px solid var(--border); background: transparent; color: var(--text-dim); font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px; }
+    .stage-btn:hover { color: var(--text); border-color: var(--accent); }
     .stage-btn.active { background: linear-gradient(135deg, rgba(180,100,220,0.35), rgba(140,70,200,0.20)); border-color: rgba(192,132,232,0.55); color: var(--text); box-shadow: 0 0 12px rgba(192,132,232,0.15); }
     .chat { flex: 1; overflow-y: auto; padding: 20px 16px 8px; display: flex; flex-direction: column; gap: 14px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .chat::-webkit-scrollbar { display: none; }
@@ -55,13 +38,13 @@
     .typing span:nth-child(2){animation-delay:0.18s;} .typing span:nth-child(3){animation-delay:0.36s;}
     @keyframes pulse{0%,60%,100%{opacity:0.25;transform:scale(0.9);}30%{opacity:1;transform:scale(1.2);}}
     .quick-wrap { padding: 4px 16px 12px; flex-shrink: 0; }
-    .quick-label { text-align:center; font-size:9px; letter-spacing:2px; color:rgba(200,165,220,0.35); text-transform:uppercase; margin-bottom:10px; }
-    .quick-btn { display:block; width:100%; margin-bottom:7px; padding:11px 16px; border-radius:28px; border:0.5px solid rgba(210,170,230,0.18); background: rgba(255,255,255,0.04); color:rgba(200,165,220,0.60); font-size:13px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:left; transition: all 0.2s ease; }
+    .quick-label { text-align:center; font-size:9px; letter-spacing:2px; color:var(--text-faint); text-transform:uppercase; margin-bottom:10px; }
+    .quick-btn { display:block; width:100%; margin-bottom:7px; padding:11px 16px; border-radius:28px; border:0.5px solid var(--border); background: rgba(255,255,255,0.04); color:var(--text-dim); font-size:13px; font-family:'DM Sans',sans-serif; cursor:pointer; text-align:left; transition: all 0.2s ease; }
     .quick-btn:hover { background: rgba(180,100,220,0.12); color:var(--text); border-color:rgba(192,132,232,0.35); }
     .quick-btn:active { background:rgba(180,100,220,0.18); transform: scale(0.99); }
-    .input-wrap { padding:10px 14px 28px; border-top:0.5px solid rgba(210,170,230,0.10); display:flex; gap:10px; align-items:flex-end; background: rgba(20,10,36,0.85); backdrop-filter: blur(12px); flex-shrink:0; }
-    textarea { flex:1; background:rgba(255,255,255,0.06); border:0.5px solid rgba(210,170,230,0.18); border-radius:24px; padding:11px 18px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; resize:none; min-height:44px; max-height:110px; line-height:1.5; -webkit-appearance:none; transition: border-color 0.2s; }
-    textarea::placeholder { color:rgba(200,165,220,0.35); }
+    .input-wrap { padding:10px 14px 28px; border-top:0.5px solid var(--border-soft); display:flex; gap:10px; align-items:flex-end; background: rgba(20,10,36,0.85); backdrop-filter: blur(12px); flex-shrink:0; }
+    textarea { flex:1; background:rgba(255,255,255,0.06); border:0.5px solid var(--border); border-radius:24px; padding:11px 18px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; resize:none; min-height:44px; max-height:110px; line-height:1.5; -webkit-appearance:none; transition: border-color 0.2s; }
+    textarea::placeholder { color:var(--text-faint); }
     textarea:focus { border-color:rgba(192,132,232,0.45); background:rgba(255,255,255,0.08); }
     .send { width:44px; height:44px; border-radius:50%; background: linear-gradient(135deg, rgba(180,100,220,0.45), rgba(140,70,200,0.30)); border:0.5px solid rgba(192,132,232,0.45); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; transition:all 0.2s; box-shadow: 0 0 12px rgba(150,80,200,0.2); }
     .send:active { background:rgba(180,100,220,0.6); transform:scale(0.95); }
@@ -94,6 +77,7 @@
     </div>
   </div>
   <script>
+    const API_KEY = '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';
     const SYSTEM = {
       wounded: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: calm, direct, real. Like a woman who has been through it herself. Never say "hey love" or use filler. Respond directly to exactly what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. WOUNDED stage: She may still be in it or just left. Validate first, help her see the pattern gently. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
       healing: `You are the coach behind "Becoming Her" — a brand helping women heal from toxic and narcissistic relationships. Tone: grounded, empowering, honest. Never use filler. Respond directly to what she said. 3-5 sentences. One follow-up question max. Never repeat yourself. HEALING stage: She's out or getting out. Help her understand her patterns and rebuild herself. After 4-6 exchanges naturally invite her to the Inner Circle: "If you're ready to go deeper, there's a whole community of women walking this same path inside the Becoming Her Inner Circle — $47/month at https://whop.com/checkout/plan_E5GPMpB3tGrzZ"`,
@@ -139,12 +123,22 @@
     }
     async function callAPI(userMsg) {
       history.push({role:'user',content:userMsg});
-      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:SYSTEM[stage],messages:history})});
-      if(!res.ok){const e=await res.json().catch(()=>({})); throw new Error(e.error||'Error '+res.status);}
-      const data=await res.json();
-      if(!data.reply) throw new Error('Empty response');
-      history.push({role:'assistant',content:data.reply});
-      return data.reply;
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 500, system: SYSTEM[stage], messages: history })
+      });
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||'Error '+res.status); }
+      const data = await res.json();
+      const reply = data.content?.[0]?.text;
+      if(!reply) throw new Error('Empty response');
+      history.push({role:'assistant',content:reply});
+      return reply;
     }
     async function send() {
       if(busy) return;
@@ -155,7 +149,7 @@
       document.getElementById('sendBtn').disabled=true;
       busy=true; addBubble('user',text); showTyping();
       try { const reply=await callAPI(text); hideTyping(); addBubble('coach',reply); }
-      catch(e) { hideTyping(); history.pop(); setError('Connection issue — please try again.'); }
+      catch(e) { hideTyping(); history.pop(); setError('Connection issue — please try again.'); console.error(e); }
       busy=false; document.getElementById('sendBtn').disabled=false;
     }
     function sendQuick(text) { document.getElementById('quickWrap').style.display='none'; document.getElementById('input').value=text; send(); }
